@@ -94,6 +94,12 @@ func initEngineAndDataSources(configFileURI string, gitOptions *gitOptions) erro
 		return fmt.Errorf("error marshalling YAML: %w", err)
 	}
 
+	if config.ConfigGitRepo != nil && len(config.ConfigGitRepo.Username) == 0 && len(config.ConfigGitRepo.PasswordOrPAT) == 0 &&
+		gitOptions != nil && len(gitOptions.Username) > 0 && len(gitOptions.PasswordOrPAT) > 0 {
+		config.ConfigGitRepo.Username = gitOptions.Username
+		config.ConfigGitRepo.PasswordOrPAT = gitOptions.PasswordOrPAT
+	}
+
 	for engineIndex, engine := range config.Engines {
 		engineURL := engine.HgeURL
 		hgeMetadataBuffer := &bytes.Buffer{}
