@@ -7,7 +7,15 @@ import (
 )
 
 func Test_initEngineAndDataSources_local_uri(t *testing.T) {
-	configFileURI := "test/chinook-ct-cloud-demo.yaml"
+	configFileURI := "examples/demo/chinook-demo-local.yaml"
+	var gitOptions *gitOptions = nil
+
+	err := initEngineAndDataSources(configFileURI, gitOptions)
+	assert.Equal(t, err, nil)
+}
+
+func Test_initEngineAndDataSources_local_uri_web(t *testing.T) {
+	configFileURI := "examples/demo/chinook-demo-local-web.yaml"
 	var gitOptions *gitOptions = nil
 
 	err := initEngineAndDataSources(configFileURI, gitOptions)
@@ -15,7 +23,7 @@ func Test_initEngineAndDataSources_local_uri(t *testing.T) {
 }
 
 func Test_initEngineAndDataSources_local_uri_git(t *testing.T) {
-	configFileURI := "test/chinook-ct-cloud-demo-git.yaml"
+	configFileURI := "examples/demo/chinook-demo-local-git.yaml"
 	var gitOptions *gitOptions = nil
 
 	err := initEngineAndDataSources(configFileURI, gitOptions)

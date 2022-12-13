@@ -1,0 +1,93 @@
+name: Kitchen Sink Chinook Demo
+desc: Multi-HGE demo representing a more complex deployment using Docker Compose locally
+configRootURI: https://raw.githubusercontent.com/hasura/chinook-demo/main
+#configGitRepo:
+#  uri:
+#  branch:
+#  username:
+#  passwordOrPAT:
+engines:
+  - name: hr
+    desc: 
+    hgeURL: http://localhost:8012
+    hgeAdminSecret: myadminsecretkey
+    metadata: 
+      uri: metadata/hr-metadata.json
+      overrides:
+        - find: $.metadata.sources[?(@.name=='default')].configuration.connection_info.database_url
+          replaceWith: postgres://postgres:postgrespassword@postgres:5432/chinook_corp
+    dataSourceInits:
+      - metadataDataSourceName: default
+        fileURI: data-init/hr.sql
+  - name: crm
+    desc: 
+    hgeURL: http://localhost:8013
+    hgeAdminSecret: myadminsecretkey
+    metadata:
+      uri: metadata/crm-metadata.json
+      overrides:
+        - find: $.metadata.sources[?(@.name=='default')].configuration.connection_info.database_url
+          replaceWith: postgres://postgres:postgrespassword@postgres:5432/chinook_corp
+    dataSourceInits:
+      - metadataDataSourceName: default
+        fileURI: data-init/crm.sql
+  - name: orders
+    desc: 
+    hgeURL: http://localhost:8014
+    hgeAdminSecret: myadminsecretkey
+    metadata:
+      uri: metadata/orders-metadata.json
+      overrides:
+        - find: $.metadata.sources[?(@.name=='default')].configuration.connection_info.database_url
+          replaceWith: postgres://postgres:postgrespassword@postgres:5432/chinook_corp
+    dataSourceInits:
+      - metadataDataSourceName: default
+        fileURI: data-init/orders.sql
+  - name: main
+    desc: 
+    hgeURL: http://localhost:8011
+    hgeAdminSecret: myadminsecretkey
+    metadata:
+      uri: metadata/main-metadata.json
+      overrides:
+        - find: $.metadata.sources[?(@.name=='music')].configuration.connection_info.database_url
+          replaceWith: postgres://postgres:postgrespassword@postgres:5432/chinook_music
+        - find: $.metadata.sources[?(@.name=='playlist')].configuration.connection_info.database_url
+          replaceWith: postgres://postgres:postgrespassword@postgres:5432/chinook_playlist
+        - find: $.metadata.remote_schemas[?(@.name=='crm')].definition.url
+          replaceWith: http://hge-crm:8080/v1/graphql
+        - find: $.metadata.remote_schemas[?(@.name=='crm')].definition.headers[?(@.name=='x-hasura-admin-secret')].value
+          replaceWith: myadminsecretkey
+        - find: $.metadata.remote_schemas[?(@.name=='orders')].definition.url
+          replaceWith: http://hge-orders:8080/v1/graphql
+        - find: $.metadata.remote_schemas[?(@.name=='orders')].definition.headers[?(@.name=='x-hasura-admin-secret')].value
+          replaceWith: myadminsecretkey
+        - find: $.metadata.actions[?(@.name=='delete_employees_by_pk')].definition.handler
+          replaceWith: http://hge-hr:8080/api/rest/employees
+        - find: $.metadata.actions[?(@.name=='delete_employees_by_pk')].definition.headers[?(@.name=='x-hasura-admin-secret')].value
+          replaceWith: myadminsecretkey
+        - find: $.metadata.actions[?(@.name=='employees')].definition.handler
+          replaceWith: http://hge-hr:8080/api/rest/employees
+        - find: $.metadata.actions[?(@.name=='employees')].definition.headers[?(@.name=='x-hasura-admin-secret')].value
+          replaceWith: myadminsecretkey
+        - find: $.metadata.actions[?(@.name=='employeesFlattened')].definition.handler
+          replaceWith: http://hge-hr:8080/api/rest/employees
+        - find: $.metadata.actions[?(@.name=='employeesFlattened')].definition.headers[?(@.name=='x-hasura-admin-secret')].value
+          replaceWith: myadminsecretkey
+        - find: $.metadata.actions[?(@.name=='employees_by_pk')].definition.handler
+          replaceWith: http://hge-hr:8080/api/rest/employees
+        - find: $.metadata.actions[?(@.name=='employees_by_pk')].definition.headers[?(@.name=='x-hasura-admin-secret')].value
+          replaceWith: myadminsecretkey
+        - find: $.metadata.actions[?(@.name=='insert_employees_one')].definition.handler
+          replaceWith: http://hge-hr:8080/api/rest/employees
+        - find: $.metadata.actions[?(@.name=='insert_employees_one')].definition.headers[?(@.name=='x-hasura-admin-secret')].value
+          replaceWith: myadminsecretkey
+        - find: $.metadata.actions[?(@.name=='update_employees_by_pk')].definition.handler
+          replaceWith: http://hge-hr:8080/api/rest/employees
+        - find: $.metadata.actions[?(@.name=='update_employees_by_pk')].definition.headers[?(@.name=='x-hasura-admin-secret')].value
+          replaceWith: myadminsecretkey
+    dataSourceInits:
+      - metadataDataSourceName: music
+        fileURI: data-init/music.sql
+      - metadataDataSourceName: playlist
+        fileURI: data-init/playlist.sql

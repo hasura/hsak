@@ -204,7 +204,19 @@ func Test_demo_init_local_uri(t *testing.T) {
 			"demo",
 			"init",
 			"-f",
-			"../test/chinook-ct-cloud-demo.yaml",
+			"examples/demo/chinook-demo-local.yaml",
+		},
+	)
+	assert.Equal(t, err, nil)
+}
+
+func Test_demo_init_local_uri_web(t *testing.T) {
+	err := testCLI(
+		[]string{
+			"demo",
+			"init",
+			"-f",
+			"examples/demo/chinook-demo-local-web.yaml",
 		},
 	)
 	assert.Equal(t, err, nil)
@@ -216,7 +228,7 @@ func Test_demo_init_local_uri_git(t *testing.T) {
 			"demo",
 			"init",
 			"-f",
-			"../test/chinook-ct-cloud-demo-git.yaml",
+			"examples/demo/chinook-demo-local-git.yaml",
 		},
 	)
 	assert.Equal(t, err, nil)
