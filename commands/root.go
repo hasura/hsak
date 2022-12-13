@@ -27,7 +27,7 @@ import (
 var verbose bool = false
 
 var rootCommand = &cobra.Command{
-	Use:   "hssak",
+	Use:   "hsak",
 	Short: "Hasura SE Swiss Army Knife",
 	Long:  `A CLI to manage demo build/maintenance tasks`,
 }
