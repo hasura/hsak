@@ -58,9 +58,9 @@ func runSQL(fileURI, url, hasuraAdminSecret, dataSourceName string, gitOptions *
 		return fmt.Errorf("error reading file: %s %w", fileURI, err)
 	}
 	if gitOptions != nil && len(gitOptions.Uri) > 0 {
-		fmt.Printf("  (1 of 2) Reading script file %s from %s \u2714\n", fileURI, gitOptions.Uri)
+		fmt.Printf("  1:2 Reading script file %s from %s \u2714\n", fileURI, gitOptions.Uri)
 	} else {
-		fmt.Printf("  (1 of 2) Reading script file %s \u2714\n", fileURI)
+		fmt.Printf("  1:2 Reading script file %s \u2714\n", fileURI)
 	}
 
 	payload := createQueryAPIPayload(dataSourceName, sqlBytes.Bytes())
@@ -72,7 +72,7 @@ func runSQL(fileURI, url, hasuraAdminSecret, dataSourceName string, gitOptions *
 	httpRequest.Header.Add("content-type", "application/json")
 	httpRequest.Header.Add("x-hasura-admin-secret", hasuraAdminSecret)
 
-	fmt.Printf("  (2 of 2) Executing query ")
+	fmt.Printf("  2:2 Executing query ")
 	_, httpResponseBody, err := callHasuraAPI(url, hasuraAdminSecret, payload)
 	if err != nil {
 		return fmt.Errorf("\nerror importing metadata, %w", err)

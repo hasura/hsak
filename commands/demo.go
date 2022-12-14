@@ -108,9 +108,9 @@ func initEngineAndDataSources(configFileURI string, gitOptions *gitOptions) erro
 			return fmt.Errorf("error reading file: %s %s", configFileURI, err)
 		}
 		if verbose {
-			fmt.Printf("  (%d of %d) Configuring HGE \"%s\" at %s with metadata from %s\n", engineIndex+1, len(config.Engines), engine.Name, engineURL, metadataURI)
+			fmt.Printf("  %d:%d Configuring HGE \"%s\" at %s with metadata from %s\n", engineIndex+1, len(config.Engines), engine.Name, engineURL, metadataURI)
 		} else {
-			fmt.Printf("  (%d of %d) Configuring HGE \"%s\" at %s\n", engineIndex+1, len(config.Engines), engine.Name, engineURL)
+			fmt.Printf("  %d:%d Configuring HGE \"%s\" at %s\n", engineIndex+1, len(config.Engines), engine.Name, engineURL)
 		}
 
 		hgeMetadataBytes, err := overrideJSONBytes(hgeMetadataBuffer.Bytes(), engine.Metadata.Overrides)
@@ -120,7 +120,7 @@ func initEngineAndDataSources(configFileURI string, gitOptions *gitOptions) erro
 		//fmt.Println("hgeMetadataBytes:", string(hgeMetadataBytes))
 
 		if len(engine.DataSourceInits) > 0 {
-			fmt.Printf("    (1 of 3) Loading HGE data sources connection info ")
+			fmt.Printf("    1:3 Loading HGE data sources connection info ")
 			sourcesPath := "sources"
 			if bytes.Index(hgeMetadataBytes, []byte("metadata")) > 0 {
 				sourcesPath = "metadata.sources"
@@ -142,7 +142,7 @@ func initEngineAndDataSources(configFileURI string, gitOptions *gitOptions) erro
 			}
 			fmt.Println("\u2714")
 
-			fmt.Println("    (2 of 3) Initializing data source(s)")
+			fmt.Println("    2:3 Initializing data source(s)")
 			for dataSourceIndex, dataSourceInit := range engine.DataSourceInits {
 				initBytes := &bytes.Buffer{}
 				dataSourceInitURI, err := readFile(dataSourceInit.FileURI, configFileURI, config.ConfigRootURI, config.ConfigGitRepo, initBytes)
@@ -150,9 +150,9 @@ func initEngineAndDataSources(configFileURI string, gitOptions *gitOptions) erro
 					return fmt.Errorf("error reading file: %s %w", configFileURI, err)
 				}
 				if verbose {
-					fmt.Printf("      (%d of %d) Initializing data source \"%s\" using %s ", dataSourceIndex+1, len(engine.DataSourceInits), dataSourceInit.MetadataDataSourceName, dataSourceInitURI)
+					fmt.Printf("      %d:%d Initializing data source \"%s\" using %s ", dataSourceIndex+1, len(engine.DataSourceInits), dataSourceInit.MetadataDataSourceName, dataSourceInitURI)
 				} else {
-					fmt.Printf("      (%d of %d) Initializing data source \"%s\" ", dataSourceIndex+1, len(engine.DataSourceInits), dataSourceInit.MetadataDataSourceName)
+					fmt.Printf("      %d:%d Initializing data source \"%s\" ", dataSourceIndex+1, len(engine.DataSourceInits), dataSourceInit.MetadataDataSourceName)
 				}
 
 				_, _, err = callHasuraAPI(
@@ -167,7 +167,7 @@ func initEngineAndDataSources(configFileURI string, gitOptions *gitOptions) erro
 			}
 		}
 
-		fmt.Printf("    (3 of 3) Loading remaining metadata ")
+		fmt.Printf("    3:3 Loading remaining metadata ")
 		_, _, err = callHasuraAPI(
 			engineURL+HASURA_METADATA_API_PATH,
 			engine.HgeAdminSecret,

@@ -112,9 +112,9 @@ func importMetdata(fileURI string, gitOptions *gitOptions, url, hasuraAdminSecre
 	fmt.Printf("Importing metadata to HGE at %s\n", url)
 
 	if gitOptions != nil && len(gitOptions.Uri) > 0 {
-		fmt.Printf("  (1 of 2) Reading file \"%s\" from %s ", fileURI, gitOptions.Uri)
+		fmt.Printf("  1:2 Reading file \"%s\" from %s ", fileURI, gitOptions.Uri)
 	} else {
-		fmt.Printf("  (1 of 2) Reading file \"%s\" ", fileURI)
+		fmt.Printf("  1:2 Reading file \"%s\" ", fileURI)
 	}
 	configMetadata := &bytes.Buffer{}
 	fileURI, err := readFile(fileURI, "", "", gitOptions, configMetadata)
@@ -125,7 +125,7 @@ func importMetdata(fileURI string, gitOptions *gitOptions, url, hasuraAdminSecre
 
 	payload := createMetadataPayload(configMetadata.Bytes())
 
-	fmt.Printf("  (2 of 2) Calling metadata API ")
+	fmt.Printf("  2:2 Calling metadata API ")
 	_, _, err = callHasuraAPI(url, hasuraAdminSecret, payload)
 	if err != nil {
 		return fmt.Errorf("\nerror importing metadata, %w", err)
@@ -139,7 +139,7 @@ func exportMetadata(url, hasuraAdminSecret, fileURI string, gitOptions *gitOptio
 	fmt.Printf("Exporting metadata from HGE at %s\n", url)
 	payload := []byte(HASURA_METADATA_API_EXPORT_PAYLOAD)
 
-	fmt.Printf("  (1 of 2) Calling metadata API ")
+	fmt.Printf("  1:2 Calling metadata API ")
 	_, httpResponseBody, err := callHasuraAPI(url, hasuraAdminSecret, payload)
 	if err != nil {
 		return fmt.Errorf("\nerror exporting metadata, %w", err)
@@ -147,9 +147,9 @@ func exportMetadata(url, hasuraAdminSecret, fileURI string, gitOptions *gitOptio
 	fmt.Println("\u2714")
 
 	if gitOptions != nil && len(gitOptions.Uri) > 0 {
-		fmt.Printf("  (2 of 2) Writing file \"%s\" to %s ", fileURI, gitOptions.Uri)
+		fmt.Printf("  2:2 Writing file \"%s\" to %s ", fileURI, gitOptions.Uri)
 	} else {
-		fmt.Printf("  (2 of 2) Writing file \"%s\" ", fileURI)
+		fmt.Printf("  2:2 Writing file \"%s\" ", fileURI)
 	}
 	err = writeFile(httpResponseBody, fileURI, gitOptions, gitCommitMessage)
 	if err != nil {
@@ -168,7 +168,7 @@ func reloadMetdata(url, hasuraAdminSecret string, reloadSources, reloadRemoteSch
 	payload, _ = sjson.SetBytes(payload, "args.reload_remote_schemas", reloadRemoteSchemas)
 	payload, _ = sjson.SetBytes(payload, "args.recreate_event_triggers", recreateEventTriggers)
 
-	fmt.Printf("  (1 of 1) Calling metadata API ")
+	fmt.Printf("  1:1 Calling metadata API ")
 	_, _, err := callHasuraAPI(url, hasuraAdminSecret, payload)
 	if err != nil {
 		return fmt.Errorf("\nerror reloading metadata, %w", err)
