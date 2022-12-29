@@ -147,6 +147,11 @@ func fileExists(fileURI string) (bool, error) {
 }
 
 func joinPath(path1, path2 string, isPath1Dir bool) string {
+	if len(path1) == 0 {
+		return path2
+	} else if len(path2) == 0 {
+		return path1
+	}
 	if strings.HasPrefix(path1, "http") {
 		if isPath1Dir {
 			relativeURI, _ := url.JoinPath(path1, path2)
@@ -167,28 +172,38 @@ func joinPath(path1, path2 string, isPath1Dir bool) string {
 // repoUrl, branch, relativeFileURI, username, passwordOrPAT string, writer io.Writer
 func readFile(fileURI, referenceURI, rootURI string, gitOptions *gitOptions, writer io.Writer) (string, error) {
 	if gitOptions != nil && len(gitOptions.Uri) > 0 {
-		return fileURI, gitRead(fileURI, gitOptions, writer)
+		return fileURI, gitRead(fileURI, rootURI, gitOptions, writer)
 	} else {
 		exists, err := fileExists(fileURI)
 		if !exists {
 			if len(rootURI) > 0 {
 				relativeURI := joinPath(rootURI, fileURI, true)
-				if relExists, _ := fileExists(relativeURI); relExists {
-					exists = true
+				exists, err = fileExists(relativeURI)
+				if err != nil {
+					return fileURI, err
+				} else if exists {
 					fileURI = relativeURI
 				} else {
 					relativeURI = joinPath(referenceURI, rootURI, false)
 					relativeURI = joinPath(relativeURI, fileURI, true)
-					if relExists, _ := fileExists(relativeURI); relExists {
-						exists = true
+					exists, err = fileExists(relativeURI)
+					if err != nil {
+						return fileURI, err
+					} else if exists {
 						fileURI = relativeURI
+					} else {
+						return fileURI, fmt.Errorf("error file does not exist: \"%s\"", fileURI)
 					}
 				}
 			} else {
 				relativeURI := joinPath(referenceURI, fileURI, false)
-				if relExists, _ := fileExists(relativeURI); relExists {
-					exists = true
+				exists, err := fileExists(relativeURI)
+				if err != nil {
+					return fileURI, err
+				} else if exists {
 					fileURI = relativeURI
+				} else {
+					return fileURI, fmt.Errorf("error file does not exist: \"%s\"", fileURI)
 				}
 			}
 		}
@@ -271,7 +286,7 @@ func gitClone(repoUrl, branch string, auth *gitHttp.BasicAuth) (*git.Repository,
 	return repo, worktree, nil
 }
 
-func gitRead(fileURI string, gitOptions *gitOptions, writer io.Writer) error {
+func gitRead(fileURI, rootURI string, gitOptions *gitOptions, writer io.Writer) error {
 	if gitOptions == nil {
 		return fmt.Errorf("gitRead error Git options are missing")
 	}
@@ -288,7 +303,15 @@ func gitRead(fileURI string, gitOptions *gitOptions, writer io.Writer) error {
 
 	fileHandle, err := worktree.Filesystem.Open(fileURI)
 	if err != nil {
-		return fmt.Errorf("error opening file: %w", err)
+		if len(rootURI) > 0 {
+			relativeURI := joinPath(rootURI, fileURI, true)
+			fileHandle, err = worktree.Filesystem.Open(relativeURI)
+			if err != nil {
+				return fmt.Errorf("error opening file: %w", err)
+			}
+		} else {
+			return fmt.Errorf("error opening file: %w", err)
+		}
 	}
 
 	_, err = io.Copy(writer, fileHandle)

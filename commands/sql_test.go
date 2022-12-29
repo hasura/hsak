@@ -19,7 +19,7 @@ func Test_runSQL_local_uri(t *testing.T) {
 }
 
 func Test_runSQL_web_uri(t *testing.T) {
-	fileURI := "https://raw.githubusercontent.com/hasura/chinook-demo/main/data-init/music.sql"
+	fileURI := "https://raw.githubusercontent.com/hasura/chinook-demo/main/postgres/data-init/music.sql"
 	url := "http://localhost:8050/v2/query"
 	hasuraAdminSecret := "myadminsecretkey"
 	dataSourceName := "test"
@@ -30,7 +30,7 @@ func Test_runSQL_web_uri(t *testing.T) {
 }
 
 func Test_runSQL_git_uri(t *testing.T) {
-	fileURI := "./data-init/music.sql"
+	fileURI := "postgres/data-init/music.sql"
 	url := "http://localhost:8050/v2/query"
 	hasuraAdminSecret := "myadminsecretkey"
 	dataSourceName := "test"

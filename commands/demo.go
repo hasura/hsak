@@ -71,8 +71,8 @@ type metadata struct {
 }
 
 type dataInit struct {
-	MetadataDataSourceName string `yaml:"metadataDataSourceName"`
-	FileURI                string `yaml:"fileURI"`
+	MetadataDataSourceName string   `yaml:"metadataDataSourceName"`
+	FileURIs               []string `yaml:"fileURIs"`
 }
 
 func initEngineAndDataSources(configFileURI string, gitOptions *gitOptions) error {
@@ -144,26 +144,28 @@ func initEngineAndDataSources(configFileURI string, gitOptions *gitOptions) erro
 
 			fmt.Println("    2:3 Initializing data source(s)")
 			for dataSourceIndex, dataSourceInit := range engine.DataSourceInits {
-				initBytes := &bytes.Buffer{}
-				dataSourceInitURI, err := readFile(dataSourceInit.FileURI, configFileURI, config.ConfigRootURI, config.ConfigGitRepo, initBytes)
-				if err != nil {
-					return fmt.Errorf("error reading file: %s %w", configFileURI, err)
-				}
-				if verbose {
-					fmt.Printf("      %d:%d Initializing data source \"%s\" using %s ", dataSourceIndex+1, len(engine.DataSourceInits), dataSourceInit.MetadataDataSourceName, dataSourceInitURI)
-				} else {
-					fmt.Printf("      %d:%d Initializing data source \"%s\" ", dataSourceIndex+1, len(engine.DataSourceInits), dataSourceInit.MetadataDataSourceName)
-				}
+				for _, dataInitFileURI := range dataSourceInit.FileURIs {
+					initBytes := &bytes.Buffer{}
+					dataSourceInitURI, err := readFile(dataInitFileURI, configFileURI, config.ConfigRootURI, config.ConfigGitRepo, initBytes)
+					if err != nil {
+						return fmt.Errorf("error reading file: %s %w", configFileURI, err)
+					}
+					if verbose {
+						fmt.Printf("      %d:%d Initializing data source \"%s\" using %s ", dataSourceIndex+1, len(engine.DataSourceInits), dataSourceInit.MetadataDataSourceName, dataSourceInitURI)
+					} else {
+						fmt.Printf("      %d:%d Initializing data source \"%s\" ", dataSourceIndex+1, len(engine.DataSourceInits), dataSourceInit.MetadataDataSourceName)
+					}
 
-				_, _, err = callHasuraAPI(
-					engineURL+HASURA_QUERY_API_PATH,
-					engine.HgeAdminSecret,
-					createQueryAPIPayload(dataSourceInit.MetadataDataSourceName, initBytes.Bytes()),
-				)
-				if err != nil {
-					return fmt.Errorf("\nerror importing metadata, %w", err)
+					_, _, err = callHasuraAPI(
+						engineURL+HASURA_QUERY_API_PATH,
+						engine.HgeAdminSecret,
+						createQueryAPIPayload(dataSourceInit.MetadataDataSourceName, initBytes.Bytes()),
+					)
+					if err != nil {
+						return fmt.Errorf("\nerror importing metadata, %w", err)
+					}
+					fmt.Println("\u2714")
 				}
-				fmt.Println("\u2714")
 			}
 		}
 

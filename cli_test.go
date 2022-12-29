@@ -12,7 +12,7 @@ const QUERY_URL = "http://localhost:8050/v2/query"
 const METADATA_URL = "http://localhost:8050/v1/metadata"
 const ADMIN_SECRET = "myadminsecretkey"
 const DATA_SOURCE = "test"
-const GIT_REPO_URL = "https://github.com/chris-hasura/chinook-demo.git"
+const GIT_REPO_URL = "https://github.com/chris-hasura/test-metadata.git"
 const GIT_REPO_BRANCH = "main"
 
 func testCLI(args []string) error {
@@ -49,7 +49,7 @@ func Test_sql_web_uri(t *testing.T) {
 		[]string{
 			"sql",
 			"-f",
-			"https://raw.githubusercontent.com/hasura/chinook-demo/main/data-init/music.sql",
+			"https://raw.githubusercontent.com/hasura/chinook-demo/main/postgres/data-init/music.sql",
 			"-u",
 			QUERY_URL,
 			"-S",
@@ -66,7 +66,7 @@ func Test_sql_git_uri(t *testing.T) {
 		[]string{
 			"sql",
 			"-f",
-			"./data-init/music.sql",
+			"postgres/data-init/music.sql",
 			"-u",
 			QUERY_URL,
 			"-S",
@@ -74,9 +74,9 @@ func Test_sql_git_uri(t *testing.T) {
 			"-s",
 			DATA_SOURCE,
 			"--gitRepoURI",
-			GIT_REPO_URL,
+			"https://github.com/hasura/chinook-demo.git",
 			"--gitRepoBranch",
-			GIT_REPO_BRANCH,
+			"main",
 			//			"--gitUsername",
 			//			GIT_USERNAME,
 			//			"--gitPasswordOrPAT",
@@ -108,7 +108,7 @@ func Test_config_import_web_uri(t *testing.T) {
 			"config",
 			"import",
 			"-f",
-			"https://raw.githubusercontent.com/chris-hasura/chinook-demo/main/metadata/hasura-metadata.json",
+			"https://raw.githubusercontent.com/chris-hasura/test-metadata/main/import/metadata.json",
 			"-u",
 			METADATA_URL,
 			"-S",
@@ -124,7 +124,7 @@ func Test_config_import_git_uri(t *testing.T) {
 			"config",
 			"import",
 			"-f",
-			"metadata/hasura-metadata.json",
+			"import/metadata.json",
 			"-u",
 			METADATA_URL,
 			"-S",
@@ -164,7 +164,7 @@ func Test_config_export_git_uri(t *testing.T) {
 			"config",
 			"export",
 			"-f",
-			"test/metadata-export.json",
+			"export/metadata.json",
 			"-u",
 			METADATA_URL,
 			"-S",

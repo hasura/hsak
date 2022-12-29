@@ -32,7 +32,7 @@ hsak sql -f ./test/chinook-music.sql -u QUERY_URL -S ADMIN_SECRET -s DATA_SOURCE
 
 Execute SQL a web server script on HGE data source
 ```
-hsak sql -f https://raw.githubusercontent.com/hasura/chinook-demo/main/data-init/music.sql -u QUERY_URL -S ADMIN_SECRET -s DATA_SOURCE
+hsak sql -f https://raw.githubusercontent.com/hasura/chinook-demo/main/postgres/data-init/music.sql -u QUERY_URL -S ADMIN_SECRET -s DATA_SOURCE
 ```
 
 Execute SQL a script from a Git repository on HGE data source
@@ -47,7 +47,7 @@ hsak config import -f ./test/hasura-metadata.json -u METADATA_URL -S ADMIN_SECRE
 
 Import HGE metadata from a web server file
 ```
-hsak config import -f https://raw.githubusercontent.com/chris-hasura/chinook-demo/main/metadata/hasura-metadata.json -u METADATA_URL -S ADMIN_SECRET
+hsak config import -f https://raw.githubusercontent.com/hasura/chinook-demo/main/postgres/metadata/hasura-metadata.json -u METADATA_URL -S ADMIN_SECRET
 ```
 
 Import HGE metadata from a file in a Git repository

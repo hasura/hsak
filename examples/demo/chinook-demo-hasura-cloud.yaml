@@ -1,6 +1,6 @@
 name: Kitchen Sink Chinook Demo
 desc: Multi-HGE demo representing a more complex deployment
-configRootURI: https://raw.githubusercontent.com/hasura/chinook-demo/main
+configRootURI: https://raw.githubusercontent.com/hasura/chinook-demo/main/postgres
 engines:
   - name: hr
     desc: 
@@ -13,7 +13,8 @@ engines:
           replaceWith: <replace with Postgres connection string>
     dataSourceInits:
       - metadataDataSourceName: default
-        fileURI: data-init/hr.sql
+        fileURIs:
+          - data-init/hr.sql
   - name: crm
     desc: 
     hgeURL: https://<crm-project>.hasura.app
@@ -25,7 +26,8 @@ engines:
           replaceWith: <replace with Postgres connection string>
     dataSourceInits:
       - metadataDataSourceName: default
-        fileURI: data-init/crm.sql
+        fileURIs:
+          - data-init/crm.sql
   - name: orders
     desc: 
     hgeURL: https://<orders-project>.hasura.app
@@ -37,7 +39,8 @@ engines:
           replaceWith: <replace with Postgres connection string>
     dataSourceInits:
       - metadataDataSourceName: default
-        fileURI: data-init/orders.sql
+        fileURIs:
+          - data-init/orders.sql
   - name: main
     desc: 
     hgeURL: https://<main-project>-.hasura.app
@@ -83,6 +86,8 @@ engines:
           replaceWith: <replace with admin secret>
     dataSourceInits:
       - metadataDataSourceName: music
-        fileURI: data-init/music.sql
+        fileURI:
+          - data-init/music.sql
       - metadataDataSourceName: playlist
-        fileURI: data-init/playlist.sql
+        fileURI:
+          - data-init/playlist.sql

@@ -13,7 +13,8 @@ engines:
           replaceWith: postgres://postgres:postgrespassword@postgres:5432/chinook_corp
     dataSourceInits:
       - metadataDataSourceName: default
-        fileURI: data-init/hr.sql
+        fileURIs:
+          - data-init/hr.sql
   - name: crm
     desc: 
     hgeURL: http://localhost:8013
@@ -25,7 +26,8 @@ engines:
           replaceWith: postgres://postgres:postgrespassword@postgres:5432/chinook_corp
     dataSourceInits:
       - metadataDataSourceName: default
-        fileURI: data-init/crm.sql
+        fileURIs:
+          - data-init/crm.sql
   - name: orders
     desc: 
     hgeURL: http://localhost:8014
@@ -37,7 +39,8 @@ engines:
           replaceWith: postgres://postgres:postgrespassword@postgres:5432/chinook_corp
     dataSourceInits:
       - metadataDataSourceName: default
-        fileURI: data-init/orders.sql
+        fileURIs:
+          - data-init/orders.sql
   - name: main
     desc: 
     hgeURL: http://localhost:8011
@@ -83,6 +86,8 @@ engines:
           replaceWith: myadminsecretkey
     dataSourceInits:
       - metadataDataSourceName: music
-        fileURI: data-init/music.sql
+        fileURIs:
+          - data-init/music.sql
       - metadataDataSourceName: playlist
-        fileURI: data-init/playlist.sql
+        fileURIs: 
+          - data-init/playlist.sql
