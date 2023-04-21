@@ -1,0 +1,106 @@
+name: Kitchen Sink Chinook Demo
+desc: Multi-HGE demo representing a more complex deployment
+configRootURI: https://raw.githubusercontent.com/hasura/chinook-demo/main/postgres
+engines:
+  - name: hr
+    desc: 
+    hgeURL: https://<hr-project>.hasura.app
+    hgeAdminSecret: <replace with admin secret>
+    metadata: 
+      uri: hge-metadata-hr.json
+      overrides:
+        - find: $.metadata.sources[?(@.name=='default')].configuration.connection_info.database_url
+          replaceWith: postgres://postgres:postgrespassword@postgres:5432/chinook_corp
+    dataSourceInits:
+      - metadataDataSourceName: default
+        fileURIs:
+          - data-init/hr.sql
+  - name: crm
+    desc: 
+    hgeURL: https://<crm-project>.hasura.app
+    hgeAdminSecret: <replace with admin secret>
+    metadata:
+      uri: hge-metadata-crm.json
+      overrides:
+        - find: $.metadata.sources[?(@.name=='default')].configuration.connection_info.database_url
+          replaceWith: postgres://postgres:postgrespassword@postgres:5432/chinook_corp
+    dataSourceInits:
+      - metadataDataSourceName: default
+        fileURIs:
+          - data-init/crm.sql
+  - name: services-data-init
+    desc: 
+    hgeURL: https://<orders-project>.hasura.app
+    hgeAdminSecret: <replace with admin secret>
+    metadata:
+      uri: hge-metadata-crm.json
+      overrides:
+        - find: $.metadata.sources[?(@.name=='default')].configuration.connection_info.database_url
+          replaceWith: postgres://postgres:postgrespassword@postgres:5432/chinook_corp
+    dataSourceInits:
+      - metadataDataSourceName: default
+        fileURIs:
+          - ../common/data-init/pg/orders.sql
+          - ../common/data-init/pg/devices.sql
+  - name: orders
+    desc: 
+    hgeURL: https://<orders-project>.hasura.app
+    hgeAdminSecret: <replace with admin secret>
+    metadata:
+      uri: ../common/hge-metadata-orders.json
+      overrides:
+        - find: $.metadata.sources[?(@.name=='default')].configuration.connection_info.database_url
+          replaceWith: postgres://postgres:postgrespassword@postgres:5432/chinook_corp
+        - find: $.metadata.actions[?(@.name=='getInvoiceById')].definition.handler
+          replaceWith: https://<orders-microservice-endpoint>
+        - find: $.metadata.actions[?(@.name=='getInvoiceLines')].definition.handler
+          replaceWith: https://<orders-microservice-endpoint>
+        - find: $.metadata.actions[?(@.name=='getInvoices')].definition.handler
+          replaceWith: https://<orders-microservice-endpoint>
+  - name: devices
+    desc: 
+    hgeURL: https://<devices-project>.hasura.app
+    hgeAdminSecret: <replace with admin secret>
+    metadata:
+      uri: ../common/hge-metadata-devices.json
+      overrides:
+        - find: $.metadata.sources[?(@.name=='default')].configuration.connection_info.database_url
+          replaceWith: postgres://postgres:postgrespassword@postgres:5432/chinook_corp
+        - find: $.metadata.actions[?(@.name=='getDevices')].definition.handler
+          replaceWith: https://<devices-microservice-endpoint>
+        - find: $.metadata.actions[?(@.name=='getDevicesById')].definition.handler
+          replaceWith: https://<devices-microservice-endpoint>
+  - name: main
+    desc: 
+    hgeURL: https://<main-project>-.hasura.app
+    hgeAdminSecret: <replace with admin secret>
+    metadata:
+      uri: hge-metadata-main.json
+      overrides:
+        - find: $.metadata.sources[?(@.name=='music')].configuration.connection_info.database_url
+          replaceWith: postgres://postgres:postgrespassword@postgres:5432/chinook_music
+        - find: $.metadata.sources[?(@.name=='playlist')].configuration.connection_info.database_url
+          replaceWith: postgres://postgres:postgrespassword@postgres:5432/chinook_playlist
+        - find: $.metadata.remote_schemas[?(@.name=='hr')].definition.url
+          replaceWith: https://<hr-project>.hasura.app/v1/graphql
+        - find: $.metadata.remote_schemas[?(@.name=='hr')].definition.headers[?(@.name=='x-hasura-admin-secret')].value
+          replaceWith: myadminsecretkey
+        - find: $.metadata.remote_schemas[?(@.name=='crm')].definition.url
+          replaceWith: hhttps://<crm-project>.hasura.app/v1/graphql
+        - find: $.metadata.remote_schemas[?(@.name=='crm')].definition.headers[?(@.name=='x-hasura-admin-secret')].value
+          replaceWith: myadminsecretkey
+        - find: $.metadata.remote_schemas[?(@.name=='orders')].definition.url
+          replaceWith: https://<orders-project>.hasura.app/v1/graphql
+        - find: $.metadata.remote_schemas[?(@.name=='orders')].definition.headers[?(@.name=='x-hasura-admin-secret')].value
+          replaceWith: myadminsecretkey
+        - find: $.metadata.remote_schemas[?(@.name=='devices')].definition.url
+          replaceWith: https://<devices-project>.hasura.app/v1/graphql
+        - find: $.metadata.remote_schemas[?(@.name=='devices')].definition.headers[?(@.name=='x-hasura-admin-secret')].value
+          replaceWith: myadminsecretkey
+    dataSourceInits:
+      - metadataDataSourceName: music
+        fileURIs:
+          - data-init/music.sql
+      - metadataDataSourceName: playlist
+        fileURIs:
+          - data-init/playlist.sql

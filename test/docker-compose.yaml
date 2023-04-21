@@ -9,7 +9,7 @@ services:
     environment:
       POSTGRES_PASSWORD: postgrespassword
     healthcheck:
-      test: "pg_isready -q -h postgres"
+      test: "pg_isready -U postgres"
       interval: 10s
       timeout: 5s
       retries: 30
@@ -21,7 +21,7 @@ services:
   hge:
     image: hasura/graphql-engine:latest
     ports:
-    - "8010:8080"
+    - "8050:8080"
     depends_on:
       postgres:
         condition: service_healthy
