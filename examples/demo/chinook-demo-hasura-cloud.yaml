@@ -86,8 +86,8 @@ engines:
           replaceWith: <replace with admin secret>
     dataSourceInits:
       - metadataDataSourceName: music
-        fileURI:
+        fileURIs:
           - data-init/music.sql
       - metadataDataSourceName: playlist
-        fileURI:
+        fileURIs:
           - data-init/playlist.sql
