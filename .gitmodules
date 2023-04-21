@@ -1,0 +1,3 @@
+[submodule "examples/demo/chinook"]
+	path = examples/demo/chinook
+	url = https://github.com/hasura/chinook-demo
