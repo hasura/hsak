@@ -24,6 +24,9 @@ import (
 	"golang.org/x/exp/slices"
 )
 
+const HASURA_METADATA_API_PATH string = "/v1/metadata"
+const HASURA_QUERY_API_PATH string = "/v2/query"
+
 var verbose bool = false
 
 var rootCommand = &cobra.Command{
@@ -38,6 +41,8 @@ func init() {
 	rootCommand.PersistentFlags().String("gitRepoBranch", "", "Git repository branch (Env: HASURA_GIT_REPO_BRANCH)")
 	rootCommand.PersistentFlags().String("gitUsername", "", "Git username for authn & commits (Env: HASURA_GIT_USERNAME)")
 	rootCommand.PersistentFlags().String("gitPasswordOrPAT", "", "Git password or personal access token (PAT) for authn & commits (Env: HASURA_GIT_PWD_OR_PAT)")
+	rootCommand.PersistentFlags().String("metadataApiPath", HASURA_METADATA_API_PATH, "URL path for the Hasura GraphQL Engine Metadata API")
+	rootCommand.PersistentFlags().String("queryApiPath", HASURA_QUERY_API_PATH, "URL path for the Hasura GraphQL Engine Query API")
 
 	verbose = slices.Contains(os.Args, "-v") || slices.Contains(os.Args, "--verbose")
 
@@ -73,6 +78,9 @@ func init() {
 	setPersistentFlagFromEnv(rootCommand, "gitRepoBranch", "HASURA_GIT_REPO_BRANCH")
 	setPersistentFlagFromEnv(rootCommand, "gitUsername", "HASURA_GIT_USERNAME")
 	setPersistentFlagFromEnv(rootCommand, "gitPasswordOrPAT", "HASURA_GIT_PWD_OR_PAT")
+
+	setPersistentFlagFromEnv(rootCommand, "metadataApiPath", "HASURA_METADATA_API_PATH")
+	setPersistentFlagFromEnv(rootCommand, "queryApiPath", "HASURA_QUERY_API_PATH")
 }
 
 func ResetCLIFlags() {
@@ -91,6 +99,9 @@ func ResetCLIFlags() {
 	setPersistentFlagFromEnv(rootCommand, "gitRepoBranch", "HASURA_GIT_REPO_BRANCH")
 	setPersistentFlagFromEnv(rootCommand, "gitUsername", "HASURA_GIT_USERNAME")
 	setPersistentFlagFromEnv(rootCommand, "gitPasswordOrPAT", "HASURA_GIT_PWD_OR_PAT")
+
+	setPersistentFlagFromEnv(rootCommand, "metadataApiPath", "HASURA_METADATA_API_PATH")
+	setPersistentFlagFromEnv(rootCommand, "queryApiPath", "HASURA_QUERY_API_PATH")
 }
 
 func Execute() error {
@@ -144,6 +155,11 @@ func fileExists(fileURI string) (bool, error) {
 			return false, fmt.Errorf("error accessing file \"%s\": %w", fileURI, err)
 		}
 	}
+}
+
+type urlPaths struct {
+	metadataPath string
+	queryPath    string
 }
 
 func joinPath(path1, path2 string, isPath1Dir bool) string {

@@ -34,8 +34,11 @@ var runSQLCommand = &cobra.Command{
 		hasuraAdminSecret, _ := command.Flags().GetString("hasuraAdminSecret")
 		dataSourceName, _ := command.Flags().GetString("dataSourceName")
 		gitOptions := initGitOptionsFromCommand(command)
+		paths := &urlPaths{}
+		paths.metadataPath, _ = command.Flags().GetString("metadataApiPath")
+		paths.queryPath, _ = command.Flags().GetString("queryApiPath")
 
-		return runSQL(fileURI, url, hasuraAdminSecret, dataSourceName, gitOptions)
+		return runSQL(fileURI, url, paths, hasuraAdminSecret, dataSourceName, gitOptions)
 	},
 }
 
@@ -50,7 +53,7 @@ func ResetCLISqlFlags() {
 	runSQLCommand.Flags().Lookup("dataSourceName").Changed = false
 }
 
-func runSQL(fileURI, url, hasuraAdminSecret, dataSourceName string, gitOptions *gitOptions) error {
+func runSQL(fileURI, url string, paths *urlPaths, hasuraAdminSecret, dataSourceName string, gitOptions *gitOptions) error {
 	fmt.Printf("Executing script on data source \"%s\" for HGE at %s\n", dataSourceName, url)
 	sqlBytes := &bytes.Buffer{}
 	fileURI, err := readFile(fileURI, "", "", gitOptions, sqlBytes)
@@ -65,6 +68,7 @@ func runSQL(fileURI, url, hasuraAdminSecret, dataSourceName string, gitOptions *
 
 	payload := createQueryAPIPayload(dataSourceName, sqlBytes.Bytes())
 
+	url = joinPath(url, paths.queryPath, true)
 	httpRequest, err := http.NewRequest(http.MethodPost, url, bytes.NewReader(payload))
 	if err != nil {
 		return fmt.Errorf("error creating HTTP request: %w", err)

@@ -8,8 +8,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-const QUERY_URL = "http://localhost:8050/v2/query"
-const METADATA_URL = "http://localhost:8050/v1/metadata"
+const URL = "http://localhost:8050"
 const ADMIN_SECRET = "myadminsecretkey"
 const DATA_SOURCE = "test"
 const GIT_REPO_URL = "https://github.com/chris-hasura/test-metadata.git"
@@ -34,7 +33,7 @@ func Test_sql_local_uri(t *testing.T) {
 			"-f",
 			"./test/chinook-music.sql",
 			"-u",
-			QUERY_URL,
+			URL,
 			"-S",
 			ADMIN_SECRET,
 			"-s",
@@ -51,7 +50,7 @@ func Test_sql_web_uri(t *testing.T) {
 			"-f",
 			"https://raw.githubusercontent.com/hasura/chinook-demo/main/postgres/data-init/music.sql",
 			"-u",
-			QUERY_URL,
+			URL,
 			"-S",
 			ADMIN_SECRET,
 			"-s",
@@ -68,7 +67,7 @@ func Test_sql_git_uri(t *testing.T) {
 			"-f",
 			"postgres/data-init/music.sql",
 			"-u",
-			QUERY_URL,
+			URL,
 			"-S",
 			ADMIN_SECRET,
 			"-s",
@@ -94,7 +93,7 @@ func Test_config_import_local_uri(t *testing.T) {
 			"-f",
 			"./test/hasura-metadata.json",
 			"-u",
-			METADATA_URL,
+			URL,
 			"-S",
 			ADMIN_SECRET,
 		},
@@ -110,7 +109,7 @@ func Test_config_import_web_uri(t *testing.T) {
 			"-f",
 			"https://raw.githubusercontent.com/chris-hasura/test-metadata/main/import/metadata.json",
 			"-u",
-			METADATA_URL,
+			URL,
 			"-S",
 			ADMIN_SECRET,
 		},
@@ -126,7 +125,7 @@ func Test_config_import_git_uri(t *testing.T) {
 			"-f",
 			"import/metadata.json",
 			"-u",
-			METADATA_URL,
+			URL,
 			"-S",
 			ADMIN_SECRET,
 			"--gitRepoURI",
@@ -150,7 +149,7 @@ func Test_config_export_local_uri(t *testing.T) {
 			"-f",
 			"./temp/hasura-metadata-export.json",
 			"-u",
-			METADATA_URL,
+			URL,
 			"-S",
 			ADMIN_SECRET,
 		},
@@ -166,7 +165,7 @@ func Test_config_export_git_uri(t *testing.T) {
 			"-f",
 			"export/metadata.json",
 			"-u",
-			METADATA_URL,
+			URL,
 			"-S",
 			ADMIN_SECRET,
 			"--gitRepoURI",
@@ -190,7 +189,7 @@ func Test_config_reload(t *testing.T) {
 			"config",
 			"reload",
 			"-u",
-			METADATA_URL,
+			URL,
 			"-S",
 			ADMIN_SECRET,
 		},

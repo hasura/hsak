@@ -78,8 +78,10 @@ var importConfigCommand = &cobra.Command{
 		url, _ := command.Flags().GetString("url")
 		hasuraAdminSecret, _ := command.Flags().GetString("hasuraAdminSecret")
 		gitOptions := initGitOptionsFromCommand(command)
+		paths := &urlPaths{}
+		paths.metadataPath, _ = command.Flags().GetString("metadataApiPath")
 
-		return importMetdata(fileURI, gitOptions, url, hasuraAdminSecret)
+		return importMetdata(fileURI, gitOptions, url, paths, hasuraAdminSecret)
 	},
 }
 
@@ -92,8 +94,10 @@ var exportConfigCommand = &cobra.Command{
 		hasuraAdminSecret, _ := command.Flags().GetString("hasuraAdminSecret")
 		gitCommitMessage, _ := command.Flags().GetString("gitCommitMessage")
 		gitOptions := initGitOptionsFromCommand(command)
+		paths := &urlPaths{}
+		paths.metadataPath, _ = command.Flags().GetString("metadataApiPath")
 
-		return exportMetadata(url, hasuraAdminSecret, fileURI, gitOptions, gitCommitMessage)
+		return exportMetadata(url, paths, hasuraAdminSecret, fileURI, gitOptions, gitCommitMessage)
 	},
 }
 
@@ -103,12 +107,14 @@ var reloadMetadataCommand = &cobra.Command{
 	RunE: func(command *cobra.Command, args []string) error {
 		url, _ := command.Flags().GetString("url")
 		hasuraAdminSecret, _ := command.Flags().GetString("hasuraAdminSecret")
+		paths := &urlPaths{}
+		paths.metadataPath, _ = command.Flags().GetString("metadataApiPath")
 
-		return reloadMetdata(url, hasuraAdminSecret, true, true, true)
+		return reloadMetdata(url, paths, hasuraAdminSecret, true, true, true)
 	},
 }
 
-func importMetdata(fileURI string, gitOptions *gitOptions, url, hasuraAdminSecret string) error {
+func importMetdata(fileURI string, gitOptions *gitOptions, url string, paths *urlPaths, hasuraAdminSecret string) error {
 	fmt.Printf("Importing metadata to HGE at %s\n", url)
 
 	if gitOptions != nil && len(gitOptions.Uri) > 0 {
@@ -125,6 +131,7 @@ func importMetdata(fileURI string, gitOptions *gitOptions, url, hasuraAdminSecre
 
 	payload := createMetadataPayload(configMetadata.Bytes())
 
+	url = joinPath(url, paths.metadataPath, true)
 	fmt.Printf("  2:2 Calling metadata API ")
 	_, _, err = callHasuraAPI(url, hasuraAdminSecret, payload)
 	if err != nil {
@@ -135,10 +142,11 @@ func importMetdata(fileURI string, gitOptions *gitOptions, url, hasuraAdminSecre
 	return nil
 }
 
-func exportMetadata(url, hasuraAdminSecret, fileURI string, gitOptions *gitOptions, gitCommitMessage string) error {
+func exportMetadata(url string, paths *urlPaths, hasuraAdminSecret, fileURI string, gitOptions *gitOptions, gitCommitMessage string) error {
 	fmt.Printf("Exporting metadata from HGE at %s\n", url)
 	payload := []byte(HASURA_METADATA_API_EXPORT_PAYLOAD)
 
+	url = joinPath(url, paths.metadataPath, true)
 	fmt.Printf("  1:2 Calling metadata API ")
 	_, httpResponseBody, err := callHasuraAPI(url, hasuraAdminSecret, payload)
 	if err != nil {
@@ -160,7 +168,7 @@ func exportMetadata(url, hasuraAdminSecret, fileURI string, gitOptions *gitOptio
 	return nil
 }
 
-func reloadMetdata(url, hasuraAdminSecret string, reloadSources, reloadRemoteSchemas, recreateEventTriggers bool) error {
+func reloadMetdata(url string, paths *urlPaths, hasuraAdminSecret string, reloadSources, reloadRemoteSchemas, recreateEventTriggers bool) error {
 	fmt.Printf("Reloading metadata for HGE at %s\n", url)
 	payload := []byte(HASURA_METADATA_API_RELOAD_PAYLOAD)
 
@@ -168,6 +176,7 @@ func reloadMetdata(url, hasuraAdminSecret string, reloadSources, reloadRemoteSch
 	payload, _ = sjson.SetBytes(payload, "args.reload_remote_schemas", reloadRemoteSchemas)
 	payload, _ = sjson.SetBytes(payload, "args.recreate_event_triggers", recreateEventTriggers)
 
+	url = joinPath(url, paths.metadataPath, true)
 	fmt.Printf("  1:1 Calling metadata API ")
 	_, _, err := callHasuraAPI(url, hasuraAdminSecret, payload)
 	if err != nil {

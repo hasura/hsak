@@ -55,8 +55,6 @@ services:
   dca:
     image: hasura/graphql-data-connector:v2.21.0
     restart: always
-    ports:
-      - 8081:8081
     environment:
       QUARKUS_LOG_LEVEL: ERROR # FATAL, ERROR, WARN, INFO, DEBUG, TRACE
       ## https://quarkus.io/guides/opentelemetry#configuration-reference

@@ -11,8 +11,6 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
-const HASURA_METADATA_API_PATH string = "/v1/metadata"
-const HASURA_QUERY_API_PATH string = "/v2/query"
 const HASURA_DATA_SOURCE string = `{ "name": "", "kind": "", "configuration": {}, "customization": {}, "tables": [] }`
 const HASURA_METADATA_API_REPLACE_METADATA_PAYLOAD string = `{ "type": "replace_metadata", "version": 2, "args": { "allow_inconsistent_metadata": true, "metadata": { "version": 3, "sources": [] } } }`
 
@@ -42,8 +40,11 @@ var initDemoCommand = &cobra.Command{
 	RunE: func(command *cobra.Command, args []string) error {
 		configFileURI, _ := command.Flags().GetString("configFileURI")
 		gitOptions := initGitOptionsFromCommand(command)
+		paths := &urlPaths{}
+		paths.metadataPath, _ = command.Flags().GetString("metadataApiPath")
+		paths.queryPath, _ = command.Flags().GetString("queryApiPath")
 
-		return initEngineAndDataSources(configFileURI, gitOptions)
+		return initEngineAndDataSources(configFileURI, paths, gitOptions)
 	},
 }
 
@@ -75,7 +76,7 @@ type dataInit struct {
 	FileURIs               []string `yaml:"fileURIs"`
 }
 
-func initEngineAndDataSources(configFileURI string, gitOptions *gitOptions) error {
+func initEngineAndDataSources(configFileURI string, paths *urlPaths, gitOptions *gitOptions) error {
 	execPath, _ := os.Executable()
 	configBytes := &bytes.Buffer{}
 	configFileURI, err := readFile(configFileURI, execPath, "", gitOptions, configBytes)
@@ -136,7 +137,8 @@ func initEngineAndDataSources(configFileURI string, gitOptions *gitOptions) erro
 				return true
 			})
 
-			_, _, err = callHasuraAPI(engineURL+HASURA_METADATA_API_PATH, engine.HgeAdminSecret, []byte(payload))
+			engineURL = joinPath(engineURL, paths.metadataPath, true)
+			_, _, err = callHasuraAPI(engineURL, engine.HgeAdminSecret, []byte(payload))
 			if err != nil {
 				return fmt.Errorf("\nerror importing metadata, %s", err)
 			}
@@ -156,8 +158,9 @@ func initEngineAndDataSources(configFileURI string, gitOptions *gitOptions) erro
 						fmt.Printf("      %d:%d Initializing data source \"%s\" ", dataSourceIndex+1, len(engine.DataSourceInits), dataSourceInit.MetadataDataSourceName)
 					}
 
+					engineURL = joinPath(engineURL, paths.queryPath, true)
 					_, _, err = callHasuraAPI(
-						engineURL+HASURA_QUERY_API_PATH,
+						engineURL,
 						engine.HgeAdminSecret,
 						createQueryAPIPayload(dataSourceInit.MetadataDataSourceName, initBytes.Bytes()),
 					)
@@ -169,9 +172,10 @@ func initEngineAndDataSources(configFileURI string, gitOptions *gitOptions) erro
 			}
 		}
 
+		engineURL = joinPath(engineURL, paths.metadataPath, true)
 		fmt.Printf("    3:3 Loading remaining metadata ")
 		_, _, err = callHasuraAPI(
-			engineURL+HASURA_METADATA_API_PATH,
+			engineURL,
 			engine.HgeAdminSecret,
 			createMetadataPayload(hgeMetadataBytes),
 		)
